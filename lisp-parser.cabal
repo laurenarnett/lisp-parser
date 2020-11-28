@@ -61,6 +61,7 @@ executable lisp-parser
       base ^>=4.13
     , megaparsec
     , rio
+    , text
     , haskeline
   
   -- Directories containing source files.

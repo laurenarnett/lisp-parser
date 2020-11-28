@@ -7,6 +7,7 @@ import qualified Text.Megaparsec.Char.Lexer as L
 import System.Console.Haskeline
 import RIO.Char (toLower)
 import qualified RIO.Text as T
+import Data.Text.Read (double)
 
 main :: IO ()
 main = runInputT defaultSettings loop 
@@ -34,15 +35,13 @@ sc = L.space space1 (L.skipLineComment ";;") (L.skipBlockComment "/*" "*/")
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
-
-
 run :: Parser a -> Text -> Either (ParseErrorBundle Text Void) a
 run p input = runParser p "" input
 
 expr :: Parser Expr
 expr = do
   symbolOrNum <- lexeme $ takeWhile1P Nothing (/= ' ')
-  pure $ case readMaybe (T.unpack symbolOrNum) of
-    Nothing -> Symbol symbolOrNum
-    Just n -> Number n
+  pure $ case double symbolOrNum of
+    Right (n, "") -> Number n
+    _ -> Symbol symbolOrNum
   
